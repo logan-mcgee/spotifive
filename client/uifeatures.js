@@ -22,15 +22,14 @@ RegisterCommand('spotifiveui', (src, args) => {
         multiline: false,
         args: ['SpotiFive', `HUD now ${spotifive_data.hide_ui ? '^1Hidden': '^2Visible'}`]
       });
-      spotifive_data.hide_ui ? SendNuiMessage(JSON.stringify({ type: 'hideAlbum' })) : SendNuiMessage(JSON.stringify({ type: 'showAlbum' }));
+      if (spotifive_data.hide_ui) {
+        SendNuiMessage(JSON.stringify({ type: 'hideAlbum' }));
+      } else {
+        spotifive_data.album_img && SendNuiMessage(JSON.stringify({ type: 'showAlbum' }));
+      }
       break;
   }
 });
-
-const spotiPos = {
-  x: 0.5,
-  y: 0.95
-};
 
 setInterval(() => {
   if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
@@ -43,8 +42,8 @@ setInterval(() => {
         type: 'loadAlbum',
         data: {
           imageUrl: newImage,
-          x: spotiPos.x - 0.095,
-          y: spotiPos.y - 0.04
+          x: CONFIG_C.spotiPos.x - 0.095,
+          y: CONFIG_C.spotiPos.y - 0.04
         }
       }));
     }
@@ -105,18 +104,18 @@ setTick(async () => {
 
     if (!spotifive_data.playing) newTime = (spotifive_data.progress) / 1000;
 
-    DrawRect(spotiPos.x, spotiPos.y, 0.2, 0.1, 25, 20, 20, 255);
-    DrawRect(spotiPos.x, spotiPos.y + 0.048, 0.2, 0.004, 30, 215, 96, 255);
+    DrawRect(CONFIG_C.spotiPos.x, CONFIG_C.spotiPos.y, 0.2, 0.1, 25, 20, 20, 255);
+    DrawRect(CONFIG_C.spotiPos.x, CONFIG_C.spotiPos.y + 0.048, 0.2, 0.004, 30, 215, 96, 255);
 
-    DrawTxt(spotifive_data.name.limit(25), spotiPos.x - 0.05, spotiPos.y - 0.045, 0.0, 0.35);
-    DrawTxt(spotifive_data.artists.join(', ').limit(30), spotiPos.x - 0.05, spotiPos.y - 0.015, 0.0, 0.3);
+    DrawTxt(spotifive_data.name.limit(25), CONFIG_C.spotiPos.x - 0.05, CONFIG_C.spotiPos.y - 0.045, 0.0, 0.35);
+    DrawTxt(spotifive_data.artists.join(', ').limit(30), CONFIG_C.spotiPos.x - 0.05, CONFIG_C.spotiPos.y - 0.015, 0.0, 0.3);
 
-    DrawTxt(fancyTimeFormat(newTime), spotiPos.x - 0.05, spotiPos.y + 0.015, 0.0, 0.3);
-    DrawRect(spotiPos.x + 0.02, spotiPos.y + 0.026, 0.09, 0.003, 35, 30, 30, 255);
+    DrawTxt(fancyTimeFormat(newTime), CONFIG_C.spotiPos.x - 0.05, CONFIG_C.spotiPos.y + 0.015, 0.0, 0.3);
+    DrawRect(CONFIG_C.spotiPos.x + 0.02, CONFIG_C.spotiPos.y + 0.026, 0.09, 0.003, 35, 30, 30, 255);
 
     const rectWidth = 0.09 * newTime / songDur;
-    DrawRect((spotiPos.x - 0.025) + (rectWidth / 2), spotiPos.y + 0.026, rectWidth, 0.003, 255, 255, 255, 255);
-    DrawTxt(fancyTimeFormat(songDur), spotiPos.x + 0.07, spotiPos.y + 0.015, 0.0, 0.3);
+    DrawRect((CONFIG_C.spotiPos.x - 0.025) + (rectWidth / 2), CONFIG_C.spotiPos.y + 0.026, rectWidth, 0.003, 255, 255, 255, 255);
+    DrawTxt(fancyTimeFormat(songDur), CONFIG_C.spotiPos.x + 0.07, CONFIG_C.spotiPos.y + 0.015, 0.0, 0.3);
   }
 
   const playerPed = PlayerPedId();

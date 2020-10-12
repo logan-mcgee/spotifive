@@ -14,14 +14,14 @@ files {
 }
 
 client_scripts {
-  'shared/data.js',
+  'shared/config.js',
   'client/scaleform.js',
   'client/uifeatures.js',
   'client/main.js'
 }
 
 server_scripts {
-  'shared/data.js',
+  'shared/config.js',
   'server/updateCheck.js',
   'server/auth.js'
 }
