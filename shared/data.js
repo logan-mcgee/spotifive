@@ -1,4 +1,6 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
+/// <reference path="../node_modules/@citizenfx/client/index.d.ts" />
+
 CONFIG_C = {
   version: '1.0.0',
   client_id: 'c92707c27c9e40f88b19315bb753d917',
