@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@citizenfx/client": "^1.0.3022-1",
+    "@citizenfx/http-wrapper": "^0.2.2",
+    "@citizenfx/server": "^1.0.3022-1",
+    "axios": "^0.20.0",
+    "koa": "^2.13.0",
+    "query-string": "^6.13.5"
+  }
+}
