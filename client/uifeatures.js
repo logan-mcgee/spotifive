@@ -19,7 +19,7 @@ RegisterCommand('spotifiveui', (src, args) => {
       spotifive_data.hide_ui = !spotifive_data.hide_ui;
       emit('chat:addMessage', {
         color: [30, 215, 96],
-        multiline: true,
+        multiline: false,
         args: ['SpotiFive', `HUD now ${spotifive_data.hide_ui ? '^1Hidden': '^2Visible'}`]
       });
       spotifive_data.hide_ui ? SendNuiMessage(JSON.stringify({ type: 'hideAlbum' })) : SendNuiMessage(JSON.stringify({ type: 'showAlbum' }));

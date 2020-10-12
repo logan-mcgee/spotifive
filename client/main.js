@@ -8,7 +8,7 @@ RegisterCommand('spotifive', (src, args) => {
     case 'pair':
       if (GetResourceKvpString('spotifive:refresh_token') && GetResourceKvpString('spotifive:access_token')) return emit('chat:addMessage', {
         color: [30, 215, 96],
-        multiline: true,
+        multiline: false,
         args: ['SpotiFive', 'SpotiFive is already paired']
       });
 
@@ -29,13 +29,13 @@ RegisterCommand('spotifive', (src, args) => {
     case 'unpair':
       if (!GetResourceKvpString('spotifive:refresh_token') && !GetResourceKvpString('spotifive:access_token')) return emit('chat:addMessage', {
         color: [30, 215, 96],
-        multiline: true,
+        multiline: false,
         args: ['SpotiFive', 'SpotiFive already unpaired']
       });
 
       emit('chat:addMessage', {
         color: [30, 215, 96],
-        multiline: true,
+        multiline: false,
         args: ['SpotiFive', 'SpotiFive now unpaired']
       });
       SendNuiMessage(JSON.stringify({
@@ -55,7 +55,7 @@ onNet('spotifive:giveCode', (access_token, refresh_token) => {
   if (refresh_token) {
     emit('chat:addMessage', {
       color: [30, 215, 96],
-      multiline: true,
+      multiline: false,
       args: ['SpotiFive', 'SpotiFive is now paired']
     });
     SetResourceKvp('spotifive:refresh_token', refresh_token);
