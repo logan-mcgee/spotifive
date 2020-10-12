@@ -22,5 +22,6 @@ client_scripts {
 
 server_scripts {
   'shared/data.js',
+  'server/updateCheck.js',
   'server/auth.js'
 }

@@ -5,7 +5,7 @@ const { setHttpCallback } = require('@citizenfx/http-wrapper');
 const Koa = require('koa');
 const queryString = require('query-string');
 const app = new Koa();
-const axios = require('axios').default;
+if (typeof axios === 'undefined') axios = require('axios').default;
 
 const currentAuthers = {};
 
@@ -18,7 +18,7 @@ app.use(async ctx => {
     ctx.body = 'done';
     return;
   }
-  ctx.body = 'go away';
+  ctx.body = 'no.';
 });
 
 onNet('spotifive:beginPair', async (pseudoNum) => {

@@ -13,6 +13,20 @@ let spotifive_data = {
   hide_ui: false
 };
 
+RegisterCommand('spotifiveui', (src, args) => {
+  switch(args[0]) {
+    case 'toggle':
+      spotifive_data.hide_ui = !spotifive_data.hide_ui;
+      emit('chat:addMessage', {
+        color: [30, 215, 96],
+        multiline: true,
+        args: ['SpotiFive', `HUD now ${spotifive_data.hide_ui ? '^1Hidden': '^2Visible'}`]
+      });
+      spotifive_data.hide_ui ? SendNuiMessage(JSON.stringify({ type: 'hideAlbum' })) : SendNuiMessage(JSON.stringify({ type: 'showAlbum' }));
+      break;
+  }
+});
+
 const spotiPos = {
   x: 0.5,
   y: 0.95
@@ -79,20 +93,6 @@ function fancyTimeFormat(duration) {
 String.prototype.limit = function (length) {
   return this.length > length ? (this.substring(0, length) + '...') : this;
 };
-
-RegisterCommand('spotifiveui', (src, args) => {
-  switch(args[0]) {
-    case 'toggle':
-      spotifive_data.hide_ui = !spotifive_data.hide_ui;
-      emit('chat:addMessage', {
-        color: [30, 215, 96],
-        multiline: true,
-        args: ['SpotiFive', `HUD now ${spotifive_data.hide_ui ? '^1Hidden': '^2Visible'}`]
-      });
-      spotifive_data.hide_ui ? SendNuiMessage(JSON.stringify({ type: 'hideAlbum' })) : SendNuiMessage(JSON.stringify({ type: 'showAlbum' }));
-      break;
-  }
-});
 
 setTick(async () => {
   await Wait(0);
