@@ -1,5 +1,5 @@
 fx_version "bodacious"
-games {"gta5", "rdr3"}
+games {"gta5"}
 
 author "logan. (Illusive)"
 description "Spotify authentication as a wrapper."
