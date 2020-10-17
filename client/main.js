@@ -24,7 +24,7 @@ function pairCommand() {
   SendNuiMessage(JSON.stringify({
     type: 'sendLink',
     data: {
-      url: `https://accounts.spotify.com/authorize?response_type=code&client_id=${CONFIG.client_id}&scope=${CONFIG.scope}&redirect_uri=${CONFIG.redirect_uri}&state=${stateData}`
+      url: `https://accounts.spotify.com/authorize?response_type=code&client_id=${SPOTIFY_CONFIG.client_id}&scope=${SPOTIFY_CONFIG.scope}&redirect_uri=${SPOTIFY_CONFIG.redirect_uri}&state=${stateData}`
     }
   }));
 }
