@@ -2,48 +2,58 @@
 /* eslint-disable no-undef */
 /// <reference path="../node_modules/@citizenfx/client/index.d.ts" />
 
+SPOTIFIVE_COMMANDS = {
+  pair: pairCommand,
+  unpair: unpairCommand,
+};
+
+function pairCommand() {
+  if (GetResourceKvpString('spotifive:refresh_token') && GetResourceKvpString('spotifive:access_token')) return emit('chat:addMessage', {
+    color: [30, 215, 96],
+    multiline: false,
+    args: ['SpotiFive', 'SpotiFive is already paired']
+  });
+
+  console.log('PAIR SEQUENCE STARTED');
+  const pseudoNum = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  const stateData = encodeURI(JSON.stringify({
+    authCode: pseudoNum,
+    serverEndpoint: GetCurrentServerEndpoint()
+  }));
+  emitNet('spotifive:beginPair', pseudoNum);
+  SendNuiMessage(JSON.stringify({
+    type: 'sendLink',
+    data: {
+      url: `https://accounts.spotify.com/authorize?response_type=code&client_id=${CONFIG.client_id}&scope=${CONFIG.scope}&redirect_uri=${CONFIG.redirect_uri}&state=${stateData}`
+    }
+  }));
+}
+
+function unpairCommand() {
+  if (!GetResourceKvpString('spotifive:refresh_token') && !GetResourceKvpString('spotifive:access_token')) return emit('chat:addMessage', {
+    color: [30, 215, 96],
+    multiline: false,
+    args: ['SpotiFive', 'SpotiFive already unpaired']
+  });
+
+  emit('chat:addMessage', {
+    color: [30, 215, 96],
+    multiline: false,
+    args: ['SpotiFive', 'SpotiFive now unpaired']
+  });
+  SendNuiMessage(JSON.stringify({
+    type: 'hideAlbum'
+  }));
+  SetResourceKvp('spotifive:access_token', '');
+  SetResourceKvp('spotifive:refresh_token', '');
+}
+
 // eslint-disable-next-line no-undef
 RegisterCommand('spotifive', (src, args) => {
-  switch (args[0]) {
-    case 'pair':
-      if (GetResourceKvpString('spotifive:refresh_token') && GetResourceKvpString('spotifive:access_token')) return emit('chat:addMessage', {
-        color: [30, 215, 96],
-        multiline: false,
-        args: ['SpotiFive', 'SpotiFive is already paired']
-      });
-
-      console.log('PAIR SEQUENCE STARTED');
-      const pseudoNum = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      const stateData = encodeURI(JSON.stringify({
-        authCode: pseudoNum,
-        serverEndpoint: GetCurrentServerEndpoint()
-      }));
-      emitNet('spotifive:beginPair', pseudoNum);
-      SendNuiMessage(JSON.stringify({
-        type: 'sendLink',
-        data: {
-          url: `https://accounts.spotify.com/authorize?response_type=code&client_id=${CONFIG_C.client_id}&scope=${CONFIG_C.scope}&redirect_uri=${CONFIG_C.redirect_uri}&state=${stateData}`
-        }
-      }));
-      break;
-    case 'unpair':
-      if (!GetResourceKvpString('spotifive:refresh_token') && !GetResourceKvpString('spotifive:access_token')) return emit('chat:addMessage', {
-        color: [30, 215, 96],
-        multiline: false,
-        args: ['SpotiFive', 'SpotiFive already unpaired']
-      });
-
-      emit('chat:addMessage', {
-        color: [30, 215, 96],
-        multiline: false,
-        args: ['SpotiFive', 'SpotiFive now unpaired']
-      });
-      SendNuiMessage(JSON.stringify({
-        type: 'hideAlbum'
-      }));
-      SetResourceKvp('spotifive:access_token', '');
-      SetResourceKvp('spotifive:refresh_token', '');
-      break;
+  const cmd = args[0];
+  if (SPOTIFIVE_COMMANDS[cmd]) {
+    args.shift();
+    SPOTIFIVE_COMMANDS[cmd](args);
   }
 });
 
