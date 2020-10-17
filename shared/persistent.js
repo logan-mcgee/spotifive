@@ -2,7 +2,7 @@
 /// <reference path="../node_modules/@citizenfx/client/index.d.ts" />
 
 SPOTIFY_CONFIG = {
-  version: '1.0.3', //! DONT TOUCH THESE UNLESS YOU KNOW WHAT YOU ARE DOING
+  version: '1.0.4', //! DONT TOUCH THESE UNLESS YOU KNOW WHAT YOU ARE DOING
   client_id: 'c92707c27c9e40f88b19315bb753d917', //! DONT TOUCH THESE UNLESS YOU KNOW WHAT YOU ARE DOING
   scope: 'user-read-currently-playing', //! DONT TOUCH THESE UNLESS YOU KNOW WHAT YOU ARE DOING
   redirect_uri: 'https://spotifive.services.dislike.life/auth/begin', //! DONT TOUCH THESE UNLESS YOU KNOW WHAT YOU ARE DOING
