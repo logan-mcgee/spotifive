@@ -133,7 +133,6 @@ String.prototype.limit = function (length) {
 let isPaused = false;
 setTick(async () => {
   await Wait(0);
-  DrawRect(0.5, 0.5, 1.0, 1.0, 0, 0, 0, 255);
   if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
   if (spotifive_data.artists.length === 0) return;
 
