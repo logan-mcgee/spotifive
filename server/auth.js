@@ -14,12 +14,13 @@ if (GetCurrentResourceName() !== 'spotifive') {
 
 if (canRun) {
   const currentAuthers = {};
+  const currentRefresh = {};
 
   app.use(async ctx => {
     const req = await queryString.parseUrl(ctx.request.url);
     if (req.url === '/auth') {
       const pairSrc = currentAuthers[req.query.user];
-      currentAuthers[req.query.user] = null;
+      delete currentAuthers[req.query.user];
       emitNet('spotifive:giveCode', pairSrc, req.query.access_token, req.query.refresh_token);
       ctx.body = 'done';
       return;
@@ -32,6 +33,13 @@ if (canRun) {
   });
 
   onNet('spotifive:refreshToken', async (refreshToken) => {
+    const src = source;
+    if (currentRefresh[src] === GetPlayerIdentifier(src, 0)) {
+      return;
+    } else if (currentRefresh[src] !== GetPlayerIdentifier(src, 0) && currentRefresh[src]) delete currentRefresh[src];
+
+    currentRefresh[src] = GetPlayerIdentifier(src, 0);
+
     try {
       const refreshRes = await axios({
         url: 'https://spotifive.services.dislike.life/auth/renew',
@@ -39,9 +47,11 @@ if (canRun) {
           refreshToken
         }
       });
-      emitNet('spotifive:giveCode', source, refreshRes.data.access_token);
+      emitNet('spotifive:giveCode', src, refreshRes.data.access_token);
+      delete currentRefresh[src];
     } catch (err) {
       console.log('Token renewal err: ' + err);
+      delete currentRefresh[src];
     }
   });
 
