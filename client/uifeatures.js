@@ -57,7 +57,12 @@ SPOTIFIVE_COMMANDS['move'] = (args) => {
 
   if (!spotifive_data.hide_ui && spotifive_data.album_img) {
     SendNuiMessage(JSON.stringify({
-      type: 'showAlbum',
+      type: 'loadAlbum',
+      data: {
+        imageUrl: spotifive_data.album_img,
+        x: CONFIG.pos.x - 0.095,
+        y: CONFIG.pos.y - 0.04
+      }
     }));
   }
 
