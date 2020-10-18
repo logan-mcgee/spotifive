@@ -73,7 +73,6 @@ onNet('spotifive:giveCode', (access_token, refresh_token) => {
 });
 
 function refreshToken() {
-  console.log('TOKEN EXPIRED. REQUESTING REFRESH.');
   emitNet('spotifive:refreshToken', GetResourceKvpString('spotifive:refresh_token'));
 }
 

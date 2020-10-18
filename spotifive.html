@@ -64,7 +64,11 @@
           Authorization: `Bearer ${access_token}`
         }
       })
-      if (res.status !== 204 && res.status !== 200) return callbackRequest('currentSongData', { success: false, needRefresh: true, callback: callback })
+      
+      if (res.status !== 204 && res.status !== 200) {
+        console.log(`[spotifive] spotify returned ${res.stats} from currently-playing`)
+        return callbackRequest('currentSongData', { success: false, needRefresh: true, callback: callback })
+      }
       
       try {
         const data = await res.json();
