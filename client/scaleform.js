@@ -19,7 +19,7 @@ class Scaleform {
           PushScaleformMovieFunctionParameterString(arg);
           break;
         case 'number':
-          arg.includes('.') ? PushScaleformMovieFunctionParameterFloat(arg) : PushScaleformMovieFunctionParameterInt(arg);
+          Number.isInteger(parseInt(arg)) ? PushScaleformMovieFunctionParameterInt(arg) : PushScaleformMovieFunctionParameterFloat(arg);
           break;
         case 'boolean':
           PushScaleformMovieMethodParameterBool(arg);
