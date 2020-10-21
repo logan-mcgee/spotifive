@@ -72,6 +72,17 @@ onNet('spotifive:giveCode', (access_token, refresh_token) => {
   }
 });
 
+onNet('spotifive:removeCode', () => {
+  emit('chat:addMessage', {
+    color: [30, 215, 96],
+    multiline: false,
+    args: ['SpotiFive', 'Spotify token was revoked. Disabling SpotiFive']
+  });
+  SetResourceKvp('spotifive:access_token', '');
+  SetResourceKvp('spotifive:refresh_token', '');
+});
+
+
 function refreshToken() {
   emitNet('spotifive:refreshToken', GetResourceKvpString('spotifive:refresh_token'));
 }

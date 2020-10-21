@@ -39,7 +39,6 @@ if (canRun) {
     } else if (currentRefresh[src] !== GetPlayerIdentifier(src, 0) && currentRefresh[src]) delete currentRefresh[src];
 
     currentRefresh[src] = GetPlayerIdentifier(src, 0);
-
     try {
       const refreshRes = await axios({
         url: 'https://spotifive.services.dislike.life/auth/renew',
@@ -50,8 +49,12 @@ if (canRun) {
       emitNet('spotifive:giveCode', src, refreshRes.data.access_token);
       delete currentRefresh[src];
     } catch (err) {
-      console.log('Token renewal err: ' + err);
       delete currentRefresh[src];
+      if (err.message === 'Request failed with status code 403') { //? hack as i think fivem breaks err.response
+        console.log('Token revoked. removing from client');
+        return emitNet('spotifive:removeCode', src);
+      }
+      console.log('Token renewal err: ' + err);
     }
   });
 
