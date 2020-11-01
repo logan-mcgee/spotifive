@@ -105,7 +105,10 @@ function getCurrentSong(callback) {
 RegisterNuiCallbackType('currentSongData');
 
 on('__cfx_nui:currentSongData', (data, cb) => {
-  if (!data.success && data.needRefresh) return refreshToken();
+  if (!data.success && data.needRefresh) {
+    cb({ success: false });
+    return refreshToken();
+  }
   callbackIds[data.callback](data.success, data.data);
   callbackIds[data.callback] = null;
   cb({ success: true });
