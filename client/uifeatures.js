@@ -24,7 +24,14 @@ SPOTIFIVE_COMMANDS['toggle'] = () => {
   if (spotifive_data.hide_ui) {
     SendNuiMessage(JSON.stringify({ type: 'hideAlbum' }));
   } else {
-    spotifive_data.album_img && SendNuiMessage(JSON.stringify({ type: 'showAlbum' }));
+    spotifive_data.album_img && SendNuiMessage(JSON.stringify({
+      type: 'loadAlbum',
+      data: {
+        imageUrl: spotifive_data.album_img,
+        x: CONFIG.pos.x - 0.095,
+        y: CONFIG.pos.y - 0.04
+      }
+    }));
   }
 };
 
@@ -92,8 +99,8 @@ setInterval(() => {
 
     if (!spotifive_data.hide_ui) SendNuiMessage(JSON.stringify({ type: 'showAlbum' }));
 
-    spotifive_data.name = songData.item.name;
-    spotifive_data.artists = cleanedArtists;
+    spotifive_data.name = songData.item.name.limit(25);
+    spotifive_data.artists = cleanedArtists.join(', ').limit(30);
     spotifive_data.playing = !success ? false : songData.is_playing;
     spotifive_data.startTime = new Date(Date.now() - songData.progress_ms);
     spotifive_data.duration = songData.item.duration_ms;
@@ -164,8 +171,8 @@ setTick(async () => {
     DrawRect(CONFIG.pos.x, CONFIG.pos.y, 0.2, 0.1, 25, 20, 20, 255);
     DrawRect(CONFIG.pos.x, CONFIG.pos.y + 0.048, 0.2, 0.004, 30, 215, 96, 255);
 
-    DrawTxt(spotifive_data.name.limit(25), CONFIG.pos.x - 0.05, CONFIG.pos.y - 0.045, 0.0, 0.35);
-    DrawTxt(spotifive_data.artists.join(', ').limit(30), CONFIG.pos.x - 0.05, CONFIG.pos.y - 0.015, 0.0, 0.3);
+    DrawTxt(spotifive_data.name, CONFIG.pos.x - 0.05, CONFIG.pos.y - 0.045, 0.0, 0.35);
+    DrawTxt(spotifive_data.artists, CONFIG.pos.x - 0.05, CONFIG.pos.y - 0.015, 0.0, 0.3);
 
     DrawTxt(fancyTimeFormat(newTime), CONFIG.pos.x - 0.05, CONFIG.pos.y + 0.015, 0.0, 0.3);
     DrawRect(CONFIG.pos.x + 0.02, CONFIG.pos.y + 0.026, 0.09, 0.003, 35, 30, 30, 255);
