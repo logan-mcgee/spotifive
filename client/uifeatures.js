@@ -143,6 +143,7 @@ String.prototype.limit = function (length) {
 };
 
 let isPaused = false;
+let wasHidden = false;
 setTick(async () => {
   await Wait(0);
   if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
@@ -150,16 +151,19 @@ setTick(async () => {
 
   if (IsPauseMenuActive() && !isPaused) {
     isPaused = true;
+    wasHidden = spotifive_data.hide_ui;
     spotifive_data.hide_ui = true;
     SendNuiMessage(JSON.stringify({
       type: 'hideAlbum',
     }));
   } else if (!IsPauseMenuActive() && isPaused) {
     isPaused = false;
-    spotifive_data.hide_ui = false;
-    SendNuiMessage(JSON.stringify({
-      type: 'showAlbum',
-    }));
+    if (!wasHidden) {
+      spotifive_data.hide_ui = false;
+      SendNuiMessage(JSON.stringify({
+        type: 'showAlbum',
+      }));
+    }
   }
 
   if (!spotifive_data.hide_ui) {
