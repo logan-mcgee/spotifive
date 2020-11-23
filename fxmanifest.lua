@@ -16,9 +16,11 @@ files {
 client_scripts {
   'shared/persistent.js',
   'shared/config.js',
+  'client/fetch.js',
   'client/main.js',
-  'client/scaleform.js',
-  'client/uifeatures.js'
+  'components/scaleform.js',
+  'components/uifeatures.js',
+  'components/controls.js',
 }
 
 server_scripts {

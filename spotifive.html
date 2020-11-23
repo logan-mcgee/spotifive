@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <body>
-  <img id="album-img" width="4.25%" height="7.3%" style="position:fixed;visibility:hidden;top:46%;left:40.5%;z-index: -10;">
+  <img id="album-img" width="4.25%" height="7.3%"
+    style="position:fixed;visibility:hidden;top:46%;left:40.5%;z-index: -10;">
 </body>
 <script>
 
@@ -11,12 +13,11 @@
       case 'sendLink':
         window.invokeNative('openUrl', message.data.url)
         break;
-      case 'getCurrentSong':
-        getCurrentSong(message.data.access_token, message.data.callback)
-        break;
       case 'loadAlbum':
-        loadAlbum(message.data.imageUrl, message.data.x, message.data.y)
+        loadAlbum(message.data.imageUrl, message.data.x, message.data.y, message.data.opacity)
         break;
+      case 'makeRequest':
+        makeRequest(message.data.url, message.data.options, message.data.cbId);
       case 'showAlbum':
         showAlbum()
         break;
@@ -28,33 +29,21 @@
     }
   });
 
-  function loadAlbum(image, gtaX, gtaY) {
+  function loadAlbum(image, gtaX, gtaY, opacity) {
+    document.getElementById('album-img').src = image;
     document.getElementById('album-img').style.visibility = 'visible';
+    document.getElementById('album-img').style.opacity = opacity / 255
     document.getElementById('album-img').style.top = `${gtaY * 100}%`;
     document.getElementById('album-img').style.left = `${gtaX * 100}%`;
-    document.getElementById('album-img').src = image;
   }
 
   function showAlbum() {
+    if (!document.getElementById('album-img').src) return
     document.getElementById('album-img').style.visibility = 'visible';
   }
 
   function hideAlbum() {
     document.getElementById('album-img').style.visibility = 'hidden';
-  }
-
-  function callbackRequest(path, data) {
-    try {
-      fetch(`https://${GetParentResourceName()}/${path}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: JSON.stringify(data)
-      })
-    } catch (err) {
-      console.log(`err: ${err}`)
-    }
   }
 
   async function getCurrentSong(access_token, callback) {
@@ -64,21 +53,58 @@
           Authorization: `Bearer ${access_token}`
         }
       })
-      
+
       if (res.status !== 204 && res.status !== 200) {
         console.log(`[spotifive] spotify returned ${res.stats} from currently-playing`)
         return callbackRequest('currentSongData', { success: false, needRefresh: true, callback: callback })
       }
-      
+
       try {
         const data = await res.json();
         callbackRequest('currentSongData', { success: true, callback: callback, data: data })
       } catch (err) {
-        callbackRequest('currentSongData', { success: false, callback: callback, data: {paused: true} })
+        callbackRequest('currentSongData', { success: false, callback: callback, data: { paused: true } })
       }
     } catch (err) {
       console.log(`ERR: ${err}`)
     }
+  }
+
+  async function makeRequest(url, options = {}, cbId) {
+    try {
+      const res = await fetch(url, options);
+      let resData = null;
+      if (res.status !== 204) {
+        try {
+          resData = await res.json();
+        } catch (err) {
+          resData = await res.text();
+        }
+      }
+      callbackRequest({
+        status: res.status,
+        statusText: res.statusText,
+        ok: res.ok,
+        headers: res.headers,
+        type: res.type,
+        redirected: res.redirected,
+        body: res.body,
+        bodyUsed: res.bodyUsed,
+        data: resData
+      }, cbId);
+    } catch (err) {
+      callbackRequest({ ok: false, error: err }, cbId);
+    }
+  }
+
+  function callbackRequest(data, cbId) {
+    const res = fetch(`https://${GetParentResourceName()}/response`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: JSON.stringify({ ...data, cbId })
+    }).catch((err) => console.log(`err: ${err}`));
   }
 </script>
 

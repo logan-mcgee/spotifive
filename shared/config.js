@@ -5,5 +5,6 @@ CONFIG = {
   pos: { //? repositions the UI on the screen
     x: GetResourceKvpFloat('spotifive:position_x') || 0.5,
     y: GetResourceKvpFloat('spotifive:position_y') || 0.95
-  }
+  },
+  opacity: GetResourceKvpInt('spotifive:opacity') || 255
 };

@@ -44,6 +44,7 @@ function unpairCommand() {
   SendNuiMessage(JSON.stringify({
     type: 'hideAlbum'
   }));
+  emit('spotifive:disconnected');
   SetResourceKvp('spotifive:access_token', '');
   SetResourceKvp('spotifive:refresh_token', '');
 }
@@ -54,10 +55,14 @@ RegisterCommand('spotifive', (src, args) => {
   if (SPOTIFIVE_COMMANDS[cmd]) {
     args.shift();
     SPOTIFIVE_COMMANDS[cmd](args);
+  } else {
+    emit('chat:addMessage', {
+      color: [30, 215, 96],
+      multiline: false,
+      args: ['SpotiFive', `Available commands: ${Object.keys(SPOTIFIVE_COMMANDS).join(', ')}`]
+    });
   }
 });
-
-let callbackIds = {};
 
 onNet('spotifive:giveCode', (access_token, refresh_token) => {
   console.log('RECIEVED TOKEN');
@@ -69,6 +74,7 @@ onNet('spotifive:giveCode', (access_token, refresh_token) => {
       args: ['SpotiFive', 'SpotiFive is now paired']
     });
     SetResourceKvp('spotifive:refresh_token', refresh_token);
+    main();
   }
 });
 
@@ -78,6 +84,7 @@ onNet('spotifive:removeCode', () => {
     multiline: false,
     args: ['SpotiFive', 'Spotify token was revoked. Disabling SpotiFive']
   });
+  emit('spotifive:disconnected');
   SetResourceKvp('spotifive:access_token', '');
   SetResourceKvp('spotifive:refresh_token', '');
 });
@@ -89,27 +96,26 @@ function refreshToken() {
 
 function getCurrentSong(callback) {
   if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
-  // eslint-disable-next-line no-case-declarations
-  const pseudoNum = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  callbackIds[pseudoNum] = callback;
-
-  SendNuiMessage(JSON.stringify({
-    type: 'getCurrentSong',
-    data: {
-      access_token: GetResourceKvpString('spotifive:access_token'),
-      callback: pseudoNum
+  makeRequest('https://api.spotify.com/v1/me/player/currently-playing', {
+    headers: {
+      Authorization: `Bearer ${GetResourceKvpString('spotifive:access_token')}`
     }
-  }));
+  }, (res) => {
+    if (res.status === 401) refreshToken();
+    callback(res);
+  });
 }
 
-RegisterNuiCallbackType('currentSongData');
+function main() {
+  if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
+  makeRequest('https://api.spotify.com/v1/me', {
+    headers: {
+      Authorization: `Bearer ${GetResourceKvpString('spotifive:access_token')}`
+    }
+  }, (res) => {
+    if (res.status === 401) refreshToken();
+    emit('spotifive:connected', res.data);
+  });
+}
 
-on('__cfx_nui:currentSongData', (data, cb) => {
-  if (!data.success && data.needRefresh) {
-    cb({ success: false });
-    return refreshToken();
-  }
-  callbackIds[data.callback](data.success, data.data);
-  callbackIds[data.callback] = null;
-  cb({ success: true });
-});
+setTimeout(main, 5000);
