@@ -165,7 +165,7 @@ on('spotifive:disconnected', () => {
       name: '',
       startTime: 0,
       duration: 0,
-      artists: [],
+      artists: 'None',
       playing: false,
       data: {},
       progress: 0,
@@ -213,7 +213,7 @@ let wasHidden = false;
 setTick(async () => {
   await Wait(0);
   if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
-  if (spotifive_data.artists.length === 0) return;
+  if (spotifive_data.artists.length !== 'None') return;
 
   if (IsPauseMenuActive() && !isPaused) {
     isPaused = true;
@@ -257,7 +257,7 @@ setTick(async () => {
   //? SET_RADIO(tuning, station, artist, song)
   if (IsPedInAnyVehicle(playerPed) && HasScaleformMovieLoaded(scaleform.handle)) {
     SetVehicleRadioEnabled(GetVehiclePedIsIn(playerPed, false), !spotifive_data.playing);
-    scaleform.callFunc('SET_RADIO', '', `Spotify${!spotifive_data.playing ? ' - Paused' : ''}`, spotifive_data.artists.join(', '), spotifive_data.name);
+    scaleform.callFunc('SET_RADIO', '', `Spotify${!spotifive_data.playing ? ' - Paused' : ''}`, spotifive_data.artists, spotifive_data.name);
   }
 
 });
