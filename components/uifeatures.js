@@ -6,7 +6,7 @@ let spotifive_data = {
   name: '',
   startTime: 0,
   duration: 0,
-  artists: [],
+  artists: 'None',
   playing: false,
   data: {},
   progress: 0,
