@@ -117,6 +117,7 @@ SPOTIFIVE_COMMANDS['opacity'] = (args) => {
 };
 
 let checkInterval = null;
+let tickRunner = null;
 
 function updateSong() {
   if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
@@ -150,31 +151,6 @@ function updateSong() {
     spotifive_data.album_img = newImage;
   });
 }
-
-on('spotifive:connected', () => {
-  if (!checkInterval) {
-    updateSong();
-    checkInterval = setInterval(updateSong, 5000);
-  }
-});
-
-on('spotifive:disconnected', () => {
-  if (checkInterval) {
-    clearInterval(updateSong);
-    spotifive_data = {
-      name: '',
-      startTime: 0,
-      duration: 0,
-      artists: 'None',
-      playing: false,
-      data: {},
-      progress: 0,
-      album_img: '',
-      hide_ui: false
-    };
-  }
-});
-
 
 function DrawTxt(text, x, y, scale1, scale2) {
   SetTextFont(0);
@@ -210,10 +186,9 @@ String.prototype.limit = function (length) {
 
 let isPaused = false;
 let wasHidden = false;
-setTick(async () => {
-  await Wait(0);
+
+function DrawSong() {
   if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
-  if (spotifive_data.artists.length !== 'None') return;
 
   if (IsPauseMenuActive() && !isPaused) {
     isPaused = true;
@@ -260,4 +235,36 @@ setTick(async () => {
     scaleform.callFunc('SET_RADIO', '', `Spotify${!spotifive_data.playing ? ' - Paused' : ''}`, spotifive_data.artists, spotifive_data.name);
   }
 
+}
+
+on('spotifive:connected', () => {
+  if (!checkInterval) {
+    updateSong();
+    checkInterval = setInterval(updateSong, 5000);
+  }
+  if (!tickRunner) {
+    tickRunner = setTick(DrawSong);
+  }
+});
+
+on('spotifive:disconnected', () => {
+  if (checkInterval) {
+    clearInterval(checkInterval);
+    spotifive_data = {
+      name: '',
+      startTime: 0,
+      duration: 0,
+      artists: 'None',
+      playing: false,
+      data: {},
+      progress: 0,
+      album_img: '',
+      hide_ui: false
+    };
+    checkInterval = null;
+  }
+  if (tickRunner) {
+    clearTick(tickRunner);
+    tickRunner = null;
+  }
 });
