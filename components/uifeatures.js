@@ -14,6 +14,9 @@ let spotifive_data = {
   hide_ui: false
 };
 
+let isPaused = false;
+let wasHidden = false;
+
 SPOTIFIVE_COMMANDS['toggle'] = () => {
   spotifive_data.hide_ui = !spotifive_data.hide_ui;
   emit('chat:addMessage', {
@@ -120,6 +123,7 @@ let checkInterval = null;
 let tickRunner = null;
 
 function updateSong() {
+  if (isPaused || spotifive_data.hide_ui) return;
   if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
   getCurrentSong((res) => {
     if (!res.ok || res.status === 204) return;
@@ -139,7 +143,9 @@ function updateSong() {
       }));
     }
 
-    if (!spotifive_data.hide_ui && newImage) SendNuiMessage(JSON.stringify({ type: 'showAlbum' }));
+    if (!spotifive_data.hide_ui && newImage) {
+      SendNuiMessage(JSON.stringify({ type: 'showAlbum' }));
+    }
 
     spotifive_data.name = songData.item.name.limit(20);
     spotifive_data.artists = cleanedArtists.join(', ').limit(25);
@@ -184,20 +190,17 @@ String.prototype.limit = function (length) {
   return this.length > length ? (this.substring(0, length) + '...') : this;
 };
 
-let isPaused = false;
-let wasHidden = false;
-
 function DrawSong() {
   if (!GetResourceKvpString('spotifive:refresh_token') || !GetResourceKvpString('spotifive:access_token')) return;
 
-  if (IsPauseMenuActive() && !isPaused) {
+  if ((IsPauseMenuActive() || IsHudHidden()) && !isPaused) {
     isPaused = true;
     wasHidden = spotifive_data.hide_ui;
     spotifive_data.hide_ui = true;
     SendNuiMessage(JSON.stringify({
       type: 'hideAlbum',
     }));
-  } else if (!IsPauseMenuActive() && isPaused) {
+  } else if (!(IsPauseMenuActive() || IsHudHidden()) && isPaused) {
     isPaused = false;
     if (!wasHidden) {
       spotifive_data.hide_ui = false;
